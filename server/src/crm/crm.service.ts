@@ -19,6 +19,7 @@ export class CrmService {
   crmUrlPath = '';
   crmHost = '';
   host = '';
+  fileUrl = '';
 
   constructor(
     private readonly config: ConfigService,
@@ -31,10 +32,14 @@ export class CrmService {
       tenantId: this.config.get('TENANT_ID'),
       authorityHostUrl: this.config.get('AUTHORITY_HOST_URL'),
       tokenPath: this.config.get('TOKEN_PATH'),
+      SharepointUrl: this.config.get('SHAREPOINT_HOST'),
+      thumbprint: this.config.get('CERT_KEY_THUMBPRINT'),
+      certKeyPath: this.config.get('CERT_KEY_PATH'),
     };
       this.crmUrlPath = this.config.get('CRM_URL_PATH');
       this.crmHost = this.config.get('CRM_HOST');
       this.host = `${this.crmHost}${this.crmUrlPath}`;
+      this.fileUrl = this.config.get('FILE_URL');
     }
 
   private parseErrorMessage (json) {
@@ -103,6 +108,55 @@ export class CrmService {
     }
 
     return newObj;
+  }
+
+  async getDocument(headers={}) {
+    const JWToken = await ADAL.acquireSharepointToken();
+
+    console.log("JWToken from sharepoint: ", JWToken);
+
+    const fileUrl = this.fileUrl; 
+
+    const options = {
+      url: fileUrl,
+      headers: {
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: `Bearer ${JWToken}`,
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        ...headers
+      },
+      encoding: null,
+    };
+
+    return new Promise((resolve, reject) => {
+      Request.get(options, (error, response, body) => {
+        console.log("Request promise resolved: ", response);
+        console.log("body: ", body);
+        if (response.statusCode === 403) {
+          resolve("Forbidden.");
+        }
+        if (response.statusCode === 204) {
+          resolve("Got document successfully.")
+        }
+        // If response body exists,
+        // allow CRM error message to bubble up.
+        console.log("response: ", response);
+        if (body) {
+          try {
+            const jsonBody = JSON.parse(body);
+            reject(jsonBody);
+            // const parsedErrorMessage = this.parseErrorMessage(jsonBody);
+            // if (parsedErrorMessage) {
+            //   // Nest was throwing server Errors on Promise.reject()?
+            //   resolve(parsedErrorMessage);
+            // }
+          } catch(error) {
+            reject(body);
+          }
+        }
+      });
+    });
   }
 
   async get(query, maxPageSize = 100, headers= {}) {
