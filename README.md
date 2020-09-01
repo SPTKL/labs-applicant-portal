@@ -39,3 +39,4 @@ On `yarn run start`, you may run into the error `EADDRINUSE: address already in 
 To solve this, open Activity Monitor, search for all "node" processes, then force kill them.
 
 Then try `yarn run start` again.
+
