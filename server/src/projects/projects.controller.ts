@@ -7,48 +7,68 @@ import {
   Session,
   UseInterceptors,
   UseGuards,
+  Param,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { ConfigService } from '../config/config.service';
 import { ContactService } from '../contact/contact.service';
 import { JsonApiSerializeInterceptor } from '../json-api-serialize.interceptor';
 import { AuthenticateGuard } from '../authenticate.guard';
-
-export const PROJECT_ATTRS = [
-  'dcp_projectname',
-  'dcp_name',
-  'dcp_borough',
-  'statecode',
-  'statuscode',
-  'dcp_visibility',
-  '_dcp_applicant_customer_value',
-  'dcp_dcp_project_dcp_projectapplicant_Project',
-  'packages',
-];
+import { PROJECT_ATTRS } from './projects.attrs';
+import { PACKAGE_ATTRS } from '../packages/packages.attrs';
+import { PROJECTAPPLICANT_ATTRS } from './project-applicants/project-applicants.attrs';
+import { CONTACT_ATTRS } from '../contact/contacts.attrs';
 
 @UseInterceptors(new JsonApiSerializeInterceptor('projects', {
-  id: 'dcp_name',
+  id: 'dcp_projectid',
   attributes: [
     ...PROJECT_ATTRS,
+
+    'packages',
+    'project-applicants',
+    'contacts',
   ],
   packages: {
     ref: 'dcp_packageid',
     attributes: [
-      'statuscode',
-      'statecode',
-      'dcp_packagetype',
-      'dcp_visibility',
-      'dcp_packageversion',
+      ...PACKAGE_ATTRS,
     ],
+  },
+  'project-applicants': {
+    ref: 'dcp_projectapplicantid',
+    attributes: [
+      ...PROJECTAPPLICANT_ATTRS,
+
+      'contact'
+    ],
+    contact: {
+      ref: 'contactid',
+      attributes: [
+        ...CONTACT_ATTRS,
+      ],
+    },
   },
 
   // remap verbose navigation link names to
   // more concise names
   transform(project) {
-    return {
-      ...project,
-      packages: project.dcp_dcp_project_dcp_package_project,
-    };
+    try {
+      return {
+        ...project,
+        packages: project.dcp_dcp_project_dcp_package_project,
+        projectApplicants: project['project-applicants'],
+      };
+    } catch(e) {
+      if (e instanceof HttpException) {
+        throw e;
+      } else {
+        throw new HttpException({
+          code: 'PROJECTS_ERROR',
+          title: 'Failed load project(s)',
+          detail: `An error occurred while loading one or more projects. ${e.message}`,
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   },
 }))
 @UseGuards(AuthenticateGuard)
@@ -65,23 +85,40 @@ export class ProjectsController {
   }
 
   @Get('/projects')
-  async listOfCurrentUserProjects(@Session() session, @Query('email') email) {
-    let { contactId } = session;
-
-    if (email) {
-      ({ contactid: contactId } = await this.contactService.findOneByEmail(
-        email,
-      ));
-    }
+  async listOfCurrentUserProjects(@Session() session) {
+    const { contactId } = session;
 
     try {
       if (contactId) {
-        return this.projectsService.findManyByContactId(contactId);
+        return await this.projectsService.findManyByContactId(contactId);
       }
     } catch (e) {
-      const errorMessage = `${e}`;
+      if (e instanceof HttpException) {
+        throw e;
+      } else {
+        throw new HttpException({
+          code: 'FIND_USER_PROJECTS_FAILED',
+          title: 'Failed getting projects',
+          detail: `An unknown server error occured while getting projects. ${e.message}`,
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
 
-      throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
+  @Get('/projects/:id')
+  async projectById(@Param('id') id) {
+    try {
+      return await this.projectsService.getProject(id);
+    } catch (e) {
+      if (e instanceof HttpException) {
+        throw e;
+      } else {
+        throw new HttpException({
+          code: 'FIND_PROJECT_FAILED',
+          title: 'Failed getting a project',
+          detail: `An unknown server error occured while finding a project by ID. ${e.message}`,
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 }

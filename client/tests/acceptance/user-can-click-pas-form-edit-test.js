@@ -30,20 +30,26 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('User can visit edit pas-form route', async function(assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/projects');
-    await click('[data-test-project="edit-pas"]');
+    await click('[data-test-project-link="1"]');
+    await click('[data-test-package-link="1"]');
 
     assert.equal(currentURL(), '/pas-form/1/edit');
   });
 
   test('User can visit save and submit pas-form package', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/projects');
-    await click('[data-test-project="edit-pas"]');
+    await click('[data-test-project-link="1"]');
+    await click('[data-test-package-link="1"]');
     await fillIn('[data-test-input="dcpRevisedprojectname"]', 'my project name');
+    await click('[data-test-add-applicant-button]');
+    await fillIn('[data-test-input="dcpFirstname"]', 'Tess');
+    await fillIn('[data-test-input="dcpLastname"]', 'Ter');
+    await fillIn('[data-test-input="dcpEmail"]', 'tesster@planning.nyc.gov');
     await click('[data-test-save-button]');
 
     await waitFor('[data-test-submit-button]:not([disabled])');
@@ -62,8 +68,8 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
 
   test('Save button is enabled when file marked for deletion', async function (assert) {
     // TODO: Refactor factories so there doesn't need to be duplicate package
-    const project = this.server.create('project', 'applicant');
-    this.server.create('package', 'applicant', 'pasForm', 'withExistingDocuments', {
+    const project = this.server.create('project', 'toDo');
+    this.server.create('package', 'toDo', 'pasForm', 'withExistingDocuments', {
       project,
     });
 
@@ -77,8 +83,8 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Save button is enabled when file marked for upload', async function (assert) {
-    const project = this.server.create('project', 'applicant');
-    this.server.create('package', 'applicant', 'pasForm', 'withExistingDocuments', {
+    const project = this.server.create('project', 'toDo');
+    this.server.create('package', 'toDo', 'pasForm', 'withExistingDocuments', {
       project,
     });
 
@@ -94,8 +100,8 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Files marked for upload and deletion are cleared on Save', async function (assert) {
-    const project = this.server.create('project', 'applicant');
-    this.server.create('package', 'applicant', 'pasForm', 'withExistingDocuments', {
+    const project = this.server.create('project', 'toDo');
+    this.server.create('package', 'toDo', 'pasForm', 'withExistingDocuments', {
       project,
     });
 
@@ -116,7 +122,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Urban Renewal Area sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
     assert.dom('[data-test-input="dcpUrbanareaname"]').doesNotExist();
@@ -126,7 +132,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('SEQRA or CEQR sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -136,7 +142,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Industrial Business Zone sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -146,7 +152,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Landmark or Historic District sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -156,7 +162,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Other Type sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -166,7 +172,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('MIH sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -176,7 +182,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Funding Source sub Q shows conditionally', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -193,7 +199,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can save pas form', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -215,12 +221,17 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user sees a confirmation modal upon submit', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     // render form
     await visit('/pas-form/1/edit');
 
     await fillIn('[data-test-input="dcpRevisedprojectname"]', 'my project name');
+
+    await click('[data-test-add-applicant-button]');
+    await fillIn('[data-test-input="dcpFirstname"]', 'Tess');
+    await fillIn('[data-test-input="dcpLastname"]', 'Ter');
+    await fillIn('[data-test-input="dcpEmail"]', 'tesster@planning.nyc.gov');
 
     // modal doesn't exist to start
     assert.dom('[data-test-reveal-modal]').doesNotExist();
@@ -243,10 +254,11 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Urban Renewal Area sub Q, after set to no, does not block submit', async function (assert) {
-    this.server.create('package', 1, {
+    this.server.create('package', 'withExistingDocuments', 1, {
       pasForm: this.server.create('pas-form', {
         dcpUrbanrenewalarea: null,
         dcpUrbanareaname: '',
+        applicants: [this.server.create('applicant', 'organizationApplicant')],
       }),
       project: this.server.create('project'),
     });
@@ -291,7 +303,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Docs appear in attachments section when visiting from another route', async function(assert) {
-    this.server.create('package', 'applicant', 'pasForm', 'withExistingDocuments', {
+    this.server.create('package', 'toDo', 'pasForm', 'withExistingDocuments', {
       id: '1',
       project: this.server.create('project'),
     });
@@ -307,7 +319,8 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
     });
 
     await visit('/projects');
-    await click('[data-test-project="edit-pas"]');
+    await click('[data-test-project-link="1"]');
+    await click('[data-test-package-link="1"]');
 
     assert.dom('[data-test-section="attachments"').hasTextContaining('PAS Form.pdf');
   });
@@ -355,7 +368,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
 
   // applicants
   test('user can see existing applicants', async function(assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
 
     // 3 scenarios/permutations of kinds of applicants
@@ -372,7 +385,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can add new applicants', async function(assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
     await visit('/pas-form/1/edit');
 
     // can add an applicant
@@ -390,7 +403,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can remove applicants', async function(assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
     // create an applicant model
     const serverSideApplicant = this.server.create('applicant', 'organizationApplicant', { pasForm });
@@ -418,7 +431,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can toggle individual or organization applicant type', async function(assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
     this.server.create('applicant', 'individualApplicant', { pasForm });
 
@@ -432,7 +445,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
     await click('[data-test-radio-option="Organization"]');
 
     // organization input should appear after user toggles to "Organization"
-    assert.dom('[data-test-applicant-organization]').hasText('Organization');
+    assert.dom('[data-test-applicant-organization]').hasText('Organization Name');
 
     await saveForm();
 
@@ -441,7 +454,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can select a state for an applicant team member', async function(assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
 
     this.server.create('applicant', 'individualApplicant', { pasForm });
@@ -465,7 +478,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can search and add new bbls', async function (assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
 
     // array of bbl objects is dcp_dcp_projectbbl_dcp_pasform
@@ -508,7 +521,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can remove a bbl', async function (assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
 
     // array of objects
@@ -553,7 +566,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can update dcpDevelopmentsite through the radio buttons', async function (assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
 
     // array of objects
@@ -610,7 +623,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can update dcpPartiallot through the radio buttons', async function (assert) {
-    const project = this.server.create('project', 1, 'applicant');
+    const project = this.server.create('project', 1, 'toDo');
     const { pasForm } = project.packages.models[0];
 
     // array of objects
@@ -666,7 +679,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('user can create bbls and it serializes to validated bbl', async function (assert) {
-    this.server.create('project', 1, 'applicant');
+    this.server.create('project', 1, 'toDo');
 
     await visit('/pas-form/1/edit');
 
@@ -681,7 +694,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('User can add new actions and answer extra questions', async function (assert) {
-    const projectPackage = this.server.create('package', 'applicant', 'pasForm', 'withLandUseActions');
+    const projectPackage = this.server.create('package', 'toDo', 'pasForm', 'withLandUseActions');
     const packageModel = await this.owner.lookup('service:store').findRecord('package', projectPackage.id, { include: 'pas-form' });
 
     // Template block usage:
@@ -731,7 +744,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('User can delete actions', async function (assert) {
-    const projectPackage = this.server.create('package', 'applicant', 'pasForm', 'withLandUseActions');
+    const projectPackage = this.server.create('package', 'toDo', 'pasForm', 'withLandUseActions');
 
     const packageModel = await this.owner.lookup('service:store').findRecord('package', projectPackage.id, { include: 'pas-form' });
 
@@ -774,7 +787,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('User can load PAS Form with existing Land Use Actions', async function (assert) {
-    const projectPackage = this.server.create('package', 'applicant', 'pasForm', 'withLandUseActions');
+    const projectPackage = this.server.create('package', 'toDo', 'pasForm', 'withLandUseActions');
 
     await this.owner.lookup('service:store').findRecord('package', projectPackage.id, { include: 'pas-form' });
 
@@ -793,7 +806,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('Issue #235 Bug: Updating action inputs does not cause actions to show up twice', async function (assert) {
-    const projectPackage = this.server.create('package', 'applicant', 'pasForm', 'withLandUseActions');
+    const projectPackage = this.server.create('package', 'toDo', 'pasForm', 'withLandUseActions');
 
     await this.owner.lookup('service:store').findRecord('package', projectPackage.id, { include: 'pas-form' });
 
@@ -827,7 +840,7 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
   });
 
   test('selected actions are sorted properly', async function (assert) {
-    const projectPackage = this.server.create('package', 'applicant', 'pasForm', 'withLandUseActions');
+    const projectPackage = this.server.create('package', 'toDo', 'pasForm', 'withLandUseActions');
 
     await this.owner.lookup('service:store').findRecord('package', projectPackage.id, { include: 'pas-form' });
 
@@ -851,6 +864,6 @@ module('Acceptance | user can click pas-form edit', function(hooks) {
     // check that order is: (1) Renewal (2) Acquisition (3) Landfill (4) CityMap (5) Zoning Cert (6) Zoning Text Amendment
     assert
       .dom('[data-test-section="land-use-actions"]')
-      .hasText('Add a Proposed Action: -- select an action -- Land Use Actions Included in This Project Renewal Previous ULURP Numbers: This field is required ex. 200307ZRK Delete Action Acquisition of Real Property No additional information required for this action Delete Action Landfill No additional information required for this action Delete Action Change in CityMap No additional information required for this action Delete Action Zoning Certification How many Zoning Certification actions? Where in the Zoning Resolution can this action be found? Provide the Zoning Resolution section number. Ex. ZR Sec. 74-711 Which sections of the Zoning Resolution does this modify? Provide the Zoning Resolution section number(s). Ex. ZR Sec. 42-10 and 43-17 Delete Action Zoning Text Amendment Affected ZR Section Number: This field is required Provide the Zoning Resolution section number. Ex. ZR Sec. 74-711 Affected ZR Section Title: This field is required Provide the Zoning Resolution section Title. Ex. EXAMPLE Delete Action');
+      .hasText('Add a Proposed Action: -- select an action -- Land Use Actions Included in This Project Renewal Previous ULURP Numbers: ex. 200307ZRK This field is required Delete Action Acquisition of Real Property No additional information required for this action Delete Action Landfill No additional information required for this action Delete Action Change in CityMap No additional information required for this action Delete Action Zoning Certification How many Zoning Certification actions? Where in the Zoning Resolution can this action be found? Provide the Zoning Resolution section number. Ex. ZR Sec. 74-711 Which sections of the Zoning Resolution does this modify? Provide the Zoning Resolution section number(s). Ex. ZR Sec. 42-10 and 43-17 Delete Action Zoning Text Amendment Affected ZR Section Number: Provide the Zoning Resolution section number. Ex. ZR Sec. 74-711 This field is required Affected ZR Section Title: Provide the Zoning Resolution section Title. Ex. EXAMPLE This field is required Delete Action');
   });
 });

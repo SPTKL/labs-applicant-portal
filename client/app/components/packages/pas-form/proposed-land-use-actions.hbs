@@ -1,17 +1,17 @@
-{{#let @form as |Form|}}
-  <Form.Section @title="Proposed Land Use Actions">
+{{#let @form as |form|}}
+  <form.Section @title="Proposed Land Use Actions">
     <p>
-      What land use actions does the proposed project require? Identify all that apply and fill in the appropriate related information.
+      What Land Use Actions does the proposed Project require? Identify all that apply and fill in the appropriate related information.
     </p>
 
     <p class="text-small">
       Note: This is preliminary information and may change following discussion with NYC Planning.
     </p>
     <div data-test-section="land-use-actions">
-      <LandUseAction
+      <Packages::LandUseAction
         @form={{@form}}
-        @pasForm={{@form.saveableChanges}}
+        @pasForm={{@form.data}}
       />
     </div>
-  </Form.Section>
+  </form.Section>
 {{/let}}

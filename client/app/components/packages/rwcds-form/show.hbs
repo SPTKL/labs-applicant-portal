@@ -1,0 +1,341 @@
+<div class="grid-x grid-margin-x">
+  <div class="cell large-8">
+
+    <section class="form-section">
+      <h1 class="header-large">
+        <span id="project-info" class="section-anchor"></span>
+        Reasonable Worst Case Development Scenario
+        <small class="text-weight-normal">
+          {{if @package.dcpPackageversion (concat '(V' @package.dcpPackageversion ')')}}
+        </small>
+      </h1>
+
+      <h2
+        class="no-margin"
+        data-test-show="dcpProjectname"
+      >
+        {{@package.rwcdsForm.dcpProjectname}}
+        <small class="text-weight-normal">
+          {{if @package.project.dcpName (concat '(' @package.project.dcpName ')')}}
+        </small>
+      </h2>
+
+      <p class="text-large text-dark-gray">
+        {{optionset 'bbl' 'boroughs' 'label' @package.project.dcpBorough}} |
+        {{optionset 'package' 'statuscode' 'label' @package.statuscode}}
+      </p>
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-header">
+        <span id="project-description" class="section-anchor"></span>
+        Project Description
+      </h2>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          Has the project changed since submission of the Pre-Application Statement (PAS)?
+        </A.Prompt>
+        <A.Field>
+          {{optionset 'rwcdsForm' 'dcpHasprojectchangedsincesubmissionofthepas' 'label' @package.rwcdsForm.dcpHasprojectchangedsincesubmissionofthepas}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          Project site description:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpProjectsitedescription}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          Proposed development description:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpProposedprojectdevelopmentdescription}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          Will construction be done in multiple phases?
+        </A.Prompt>
+        <A.Field>
+          {{optionset 'rwcdsForm' 'dcpConstructionphasing' 'label' @package.rwcdsForm.dcpConstructionphasing}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          What is the proposed analysis year of the proposed action?
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpBuildyear}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          Analysis year rationale:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpRationalbehindthebuildyear}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          History of sites within the Project Area:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpSitehistory}}
+        </A.Field>
+      </Ui::Answer>
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-header">
+        <span id="proposed-actions" class="section-anchor"></span>
+        Proposed Actions
+      </h2>
+
+      {{#each @package.rwcdsForm.affectedZoningResolutions as |affectedZoningResolution|}}
+        {{#let (optionset
+            'affectedZoningResolution'
+            'actions'
+            'label'
+            affectedZoningResolution.dcpZoningresolutiontype)
+          as |zrTypeLabel|}}
+
+          <h3 class="large-margin-top small-margin-bottom">{{zrTypeLabel}}</h3>
+
+          <Ui::Answer @beside={{true}} as |A|>
+            <A.Prompt>
+              Modifying Zoning Resolution sections:
+            </A.Prompt>
+            <A.Field>
+              {{affectedZoningResolution.dcpModifiedzrsectionnumber}}
+            </A.Field>
+          </Ui::Answer>
+
+          <Ui::Answer @beside={{true}} as |A|>
+            <A.Prompt>
+              Pursuant to Zoning Resolution section:
+            </A.Prompt>
+            <A.Field>
+              {{affectedZoningResolution.dcpZrsectiontitle}}
+            </A.Field>
+          </Ui::Answer>
+
+          {{#if (eq
+            affectedZoningResolution.dcpZoningresolutiontype
+            (optionset 'affectedZoningResolution' 'actions' 'code' 'ZR')
+          )}}
+            <Ui::Answer @beside={{true}} as |A|>
+              <A.Prompt>
+                Includes MIH:
+              </A.Prompt>
+              <A.Field>
+                {{if (eq
+                  @package.rwcdsForm.dcpIncludezoningtextamendment
+                  (optionset 'rwcdsForm' 'dcpIncludezoningtextamendment' 'code' 'YES')
+                ) "Yes" "No"}}
+              </A.Field>
+            </Ui::Answer>
+          {{/if}}
+        {{/let}}
+      {{/each}}
+
+      <h3 class="large-margin-top small-margin-bottom">All Actions</h3>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          Purpose and need for all proposed actions:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpPurposeandneedfortheproposedaction}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          Does the applicant plan to develop a 100% affordable housing development?
+        </A.Prompt>
+        <A.Field>
+          {{if @package.rwcdsForm.dcpIsplannigondevelopingaffordablehousing "Yes" "No"}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          Is the applicant seeking actions from other City/State/Federal agencies?
+        </A.Prompt>
+        <A.Field>
+          {{optionset 'rwcdsForm' 'dcpIsapplicantseekingaction' 'label' @package.rwcdsForm.dcpIsapplicantseekingaction}}
+        </A.Field>
+      </Ui::Answer>
+
+      {{#if (eq
+        @package.rwcdsForm.dcpIsapplicantseekingaction
+        (optionset 'rwcdsForm' 'dcpIsapplicantseekingaction' 'code' 'YES')
+      )}}
+        <Ui::Answer as |A|>
+          <A.Prompt>
+            Actions sought from other agencies:
+          </A.Prompt>
+          <A.Field>
+            {{@package.rwcdsForm.dcpWhichactionsfromotheragenciesaresought}}
+          </A.Field>
+        </Ui::Answer>
+      {{/if}}
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-header">
+        <span id="analysis" class="section-anchor"></span>
+        Analysis
+      </h2>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          Description of development assumptions:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpDevelopmentsiteassumptions}}
+        </A.Field>
+      </Ui::Answer>
+
+      <h3 class="large-margin-top small-margin-bottom">
+        No-Action Scenario
+      </h3>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          Is the No-Action scenario the same as the Existing Conditions?
+        </A.Prompt>
+        <A.Field>
+          {{optionset 'rwcdsForm' 'dcpExistingconditions' 'label' @package.rwcdsForm.dcpExistingconditions}}
+        </A.Field>
+      </Ui::Answer>
+
+      {{#if @package.rwcdsForm.dcpDescribethenoactionscenario}}
+        <Ui::Answer as |A|>
+          <A.Prompt>
+            Description of No-Action scenario:
+          </A.Prompt>
+          <A.Field>
+            {{@package.rwcdsForm.dcpDescribethenoactionscenario}}
+          </A.Field>
+        </Ui::Answer>
+      {{/if}}
+
+      {{#if @package.rwcdsForm.dcpHowdidyoudeterminethenoactionscenario}}
+        <Ui::Answer as |A|>
+          <A.Prompt>
+            How No-Action scenario was determined:
+          </A.Prompt>
+          <A.Field>
+            {{@package.rwcdsForm.dcpHowdidyoudeterminethenoactionscenario}}
+          </A.Field>
+        </Ui::Answer>
+      {{/if}}
+
+      <h3 class="large-margin-top small-margin-bottom">
+        With-Action Scenario
+      </h3>
+
+      <Ui::Answer @beside={{true}} as |A|>
+        <A.Prompt>
+          Is the proposed project the same as the proposed With-Action scenario?
+        </A.Prompt>
+        <A.Field>
+          {{optionset 'rwcdsForm' 'dcpIsrwcdsscenario' 'label' @package.rwcdsForm.dcpIsrwcdsscenario}}
+        </A.Field>
+      </Ui::Answer>
+
+      {{#if (eq
+        @package.rwcdsForm.dcpIsrwcdsscenario
+        (optionset 'rwcdsForm' 'dcpIsrwcdsscenario' 'code' 'YES')
+      )}}
+        <Ui::Answer as |A|>
+          <A.Prompt>
+            Why the project is the same as the proposed With-Action scenario:
+          </A.Prompt>
+          <A.Field>
+            {{@package.rwcdsForm.dcpRwcdsexplanation}}
+          </A.Field>
+        </Ui::Answer>
+      {{/if}}
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          Description of With-Action scenario:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpDescribethewithactionscenario}}
+        </A.Field>
+      </Ui::Answer>
+
+      <Ui::Answer as |A|>
+        <A.Prompt>
+          How With-Action scenario was determined:
+        </A.Prompt>
+        <A.Field>
+          {{@package.rwcdsForm.dcpHowdidyoudeterminethiswithactionscena}}
+        </A.Field>
+      </Ui::Answer>
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-header">
+        <span id="attachments" class="section-anchor"></span>
+        Attachments
+      </h2>
+
+      <ul class="no-bullet">
+        {{#each @package.documents as |document|}}
+          <li class="ruled-adjacent tight">
+            <a
+              href={{concat (get-env-variable 'host') '/documents' document.serverRelativeUrl}}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <strong>
+                {{document.name}}
+              </strong>
+            </a>
+            <small class="text-gray">
+              {{document.timeCreated}}
+            </small>
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+
+  </div>{{! end left/main column }}
+  <div class="cell large-4 sticky-sidebar">
+
+    <Ui::PageNav
+      @navItems={{array
+        (hash anchorId="project-info"
+          label="Project Information")
+        (hash anchorId="project-description"
+          label="Description")
+        (hash anchorId="proposed-actions"
+          label="Proposed Actions")
+        (hash anchorId="analysis"
+          label="Analysis")
+        (hash anchorId="attachments"
+          label="Attachments")
+        }}
+    />
+
+    <Messages::Assistance class="large-margin-top" />
+
+  </div>{{! end right/sidebar column }}
+</div>
+
+{{yield}}

@@ -1,0 +1,250 @@
+{{#let @form as |form|}}
+  <div class="fieldset-adder">
+    <h5 class="small-margin-bottom">
+      Add a Proposed Action:
+    </h5>
+
+    <label data-test-land-use-action-picker>
+      <PowerSelect
+        supportsDataTestProperties={{true}}
+        @placeholder="-- select an action --"
+        @searchEnabled={{false}}
+        @options={{this.availableActions}}
+        @onchange={{fn this.addSelectedAction}}
+        as |landUseAction|
+      >
+        {{landUseAction.name}}
+      </PowerSelect>
+    </label>
+  </div>
+
+  {{#if this.sortedSelectedActions}}
+    <h5 class="slide-in-top">
+      Land Use Actions Included in This Project
+    </h5>
+  {{/if}}
+
+  {{#each this.sortedSelectedActions as |landUseAction|}}
+    <fieldset class="fieldset relative scale-fade-in">
+      <Ui::Legend data-test-action-name="{{landUseAction.name}}">
+        {{landUseAction.name}}
+      </Ui::Legend>
+
+      {{#if (or
+          (eq landUseAction.name "Zoning Special Permit")
+          (eq landUseAction.name "Zoning Certification")
+          (eq landUseAction.name "Zoning Authorization")
+          (eq landUseAction.name "Zoning Map Amendment")
+          (eq landUseAction.name "Zoning Text Amendment")
+          (eq landUseAction.name "Modification")
+          (eq landUseAction.name "Renewal")
+      )}}
+        {{#if (or
+          (eq landUseAction.name "Zoning Special Permit")
+          (eq landUseAction.name "Zoning Certification")
+          (eq landUseAction.name "Zoning Authorization")
+        )}}
+          <Ui::Question @required={{true}} as |Q|>
+            <div class="grid-x grid-margin-x">
+              <div class="shrink cell">
+                <Q.Label class="middle">
+                  How many {{landUseAction.name}} actions?
+                </Q.Label>
+              </div>
+              <div class="auto cell">
+                <form.Field
+                  @attribute={{landUseAction.countField}}
+                  as |TextInput|
+                >
+                  <TextInput
+                    type="number"
+                    maxlength="10"
+                    id={{Q.questionId}}
+                    data-test-input={{landUseAction.countField}}
+                  />
+                </form.Field>
+              </div>
+            </div>
+          </Ui::Question>
+
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Where in the Zoning Resolution can this action be found?
+            </Q.Label>
+
+            <p class="q-help">
+              Provide the Zoning Resolution section number. Ex. ZR Sec. 74-711
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr1}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="250"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr1}}
+              />
+            </form.Field>
+          </Ui::Question>
+
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Which sections of the Zoning Resolution does this modify?
+            </Q.Label>
+
+            <p class="q-help">
+              Provide the Zoning Resolution section number(s). Ex. ZR Sec. 42-10 and 43-17
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr2}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="250"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr2}}
+              />
+            </form.Field>
+          </Ui::Question>
+        {{/if}}
+
+        {{#if (eq landUseAction.name "Zoning Map Amendment")}}
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Existing Zoning Districts:
+            </Q.Label>
+
+            <p class="q-help">
+              ex. R7-1/C2-4
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr1}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="250"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr1}}
+              />
+            </form.Field>
+          </Ui::Question>
+
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Proposed Zoning Districts:
+            </Q.Label>
+
+            <p class="q-help">
+              ex. C4-5X
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr2}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="250"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr2}}
+              />
+            </form.Field>
+          </Ui::Question>
+        {{/if}}
+
+        {{#if (eq landUseAction.name "Zoning Text Amendment")}}
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Affected ZR Section Number:
+            </Q.Label>
+
+            <p class="q-help">
+              Provide the Zoning Resolution section number. Ex. ZR Sec. 74-711
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr1}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="250"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr1}}
+              />
+            </form.Field>
+          </Ui::Question>
+
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Affected ZR Section Title:
+            </Q.Label>
+
+            <p class="q-help">
+              Provide the Zoning Resolution section Title. Ex. EXAMPLE
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr2}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="250"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr2}}
+              />
+            </form.Field>
+          </Ui::Question>
+        {{/if}}
+
+        {{#if (or
+          (eq landUseAction.name "Modification")
+          (eq landUseAction.name "Renewal")
+        )}}
+          <Ui::Question @required={{true}} as |Q|>
+            <Q.Label>
+              Previous ULURP Numbers:
+            </Q.Label>
+
+            <p class="q-help">
+              ex. 200307ZRK
+            </p>
+
+            <form.Field
+              @attribute={{landUseAction.attr1}}
+              as |TextInput|
+            >
+              <TextInput
+                type="text"
+                maxlength="100"
+                id={{Q.questionId}}
+                data-test-input={{landUseAction.attr1}}
+              />
+            </form.Field>
+          </Ui::Question>
+        {{/if}}
+      {{else}}
+        <p class="q-help">
+          No additional information required for this action
+        </p>
+      {{/if}}
+
+      <button
+        type="button"
+        class="delete-fieldset"
+        {{on "click" (fn this.removeSelectedAction landUseAction)}}
+        data-test-delete-button="{{landUseAction.name}}"
+      >
+        Delete Action
+        <FaIcon @icon="times" @prefix="fas" @fixedWidth={{true}} />
+      </button>
+    </fieldset>
+  {{/each}}
+{{/let}}

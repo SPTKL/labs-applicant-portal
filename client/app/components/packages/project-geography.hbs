@@ -1,0 +1,96 @@
+<div class="fieldset-adder">
+  <h5 class="small-margin-bottom">
+    Add tax lots by searching for an address or BBL:
+  </h5>
+  <LabsSearch
+    @searchPlaceholder='Enter an address or BBL (ex 1001440001)'
+    @onSelect={{fn this.selectSearchResult}}
+    data-test-input="bbl-search" as |search|
+  >
+    <span class="text-black">
+      {{search.result.label}}
+      <small class="display-block text-dark-gray">{{bbl-breakup search.result.bbl}}</small>
+    </span>
+  </LabsSearch>
+</div>
+
+{{#if @bbls}}
+  <h5 class="slide-in-top">
+    Tax Lots Included in This Project
+  </h5>
+{{/if}}
+
+{{#each @bbls as |bbl|}}
+  {{#let @form as |form|}}
+    <form.SaveableForm @model={{bbl}} as |bblForm|>
+      <fieldset class="fieldset relative scale-fade-in">
+
+        <legend data-test-bbl-title="{{bbl.dcpBblnumber}}">
+          <b>{{bbl.dcpBblnumber}}</b>
+          {{if bbl.temporaryAddressLabel (concat '(' bbl.temporaryAddressLabel ')')}}
+          <Ui::ExternalLink href="https://zola.planning.nyc.gov/bbl/{{bbl.dcpBblnumber}}">View in ZoLa</Ui::ExternalLink>
+        </legend>
+
+        <fieldset>
+          <Ui::Legend data-test-development-site-question="{{bbl.dcpBblnumber}}-{{bblForm.data.dcpDevelopmentsite}}">
+            Is this BBL part of the Development Site?
+          </Ui::Legend>
+
+          <bblForm.Field
+            @attribute="dcpDevelopmentsite"
+            @type="radio"
+            as |RadioButton|
+          >
+            <RadioButton
+              @targetValue={{true}}
+              data-test-bbl-development-site-yes={{bbl.dcpBblnumber}}
+            >
+              Yes
+            </RadioButton>
+            <RadioButton
+              @targetValue={{false}}
+              data-test-bbl-development-site-no={{bbl.dcpBblnumber}}
+            >
+              No
+            </RadioButton>
+          </bblForm.Field>
+        </fieldset>
+
+        <fieldset>
+          <Ui::Legend data-test-partial-lot-question="{{bbl.dcpBblnumber}}-{{bblForm.data.dcpPartiallot}}">
+            Is only a portion of this lot included in the project area?
+          </Ui::Legend>
+
+          <bblForm.Field
+            @attribute="dcpPartiallot"
+            @type="radio"
+            as |RadioButton|
+          >
+            <RadioButton
+              @targetValue={{true}}
+              data-test-bbl-partial-lot-yes={{bbl.dcpBblnumber}}
+            >
+              Yes
+            </RadioButton>
+            <RadioButton
+              @targetValue={{false}}
+              data-test-bbl-partial-lot-no={{bbl.dcpBblnumber}}
+            >
+              No
+            </RadioButton>
+          </bblForm.Field>
+        </fieldset>
+
+        <button
+          type="button"
+          class="delete-fieldset"
+          {{on "click" (fn this.removeBbl bbl)}}
+          data-test-button-remove-bbl="{{bbl.dcpBblnumber}}"
+        >
+          Delete BBL
+          <FaIcon @icon="times" @prefix="fas" @fixedWidth={{true}} />
+        </button>
+      </fieldset>
+    </form.SaveableForm>
+  {{/let}}
+{{/each}}

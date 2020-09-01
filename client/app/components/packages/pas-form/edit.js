@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import SaveablePasFormValidations from '../../../validations/saveable-pas-form';
 import SubmittablePasFormValidations from '../../../validations/submittable-pas-form';
@@ -8,12 +7,18 @@ import SubmittablePasFormValidations from '../../../validations/submittable-pas-
 import SaveableApplicantFormValidations from '../../../validations/saveable-applicant-form';
 import SubmittableApplicantFormValidations from '../../../validations/submittable-applicant-form';
 
+import SubmittablePackageFormValidations from '../../../validations/submittable-package';
+
+import { addToHasMany, removeFromHasMany } from '../../../utils/ember-changeset';
+
 export default class PasFormComponent extends Component {
   validations = {
     SaveablePasFormValidations,
     SubmittablePasFormValidations,
     SaveableApplicantFormValidations,
     SubmittableApplicantFormValidations,
+
+    SubmittablePackageFormValidations,
   };
 
   @service
@@ -30,23 +35,13 @@ export default class PasFormComponent extends Component {
     return this.package.pasForm || {};
   }
 
-  @tracked modalIsOpen = false;
-
-  @action
-  toggleModal() {
-    this.modalIsOpen = !this.modalIsOpen;
-  }
-
   @action
   async savePackage() {
     try {
       await this.args.package.save();
-      await this.args.package.reload();
     } catch (error) {
       console.log('Save PAS package error:', error);
     }
-
-    this.args.package.refreshExistingDocuments();
   }
 
   @action
@@ -57,15 +52,19 @@ export default class PasFormComponent extends Component {
   }
 
   @action
-  addApplicant(targetEntity) {
-    this.store.createRecord('applicant', {
+  addApplicant(targetEntity, changeset) {
+    const newApplicant = this.store.createRecord('applicant', {
       targetEntity, // distinguishes between different applicant types for the backend
       pasForm: this.pasForm,
     });
+
+    addToHasMany(changeset, 'applicants', newApplicant);
   }
 
   @action
-  removeApplicant(applicant) {
+  removeApplicant(applicant, changeset) {
+    removeFromHasMany(changeset, 'applicants', applicant);
+
     applicant.deleteRecord();
   }
 }

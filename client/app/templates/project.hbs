@@ -1,0 +1,161 @@
+<Ui::Breadcrumbs as |Crumb|>
+  <Crumb @text="My Projects" @route='projects' />
+  <Crumb @text={{@model.dcpProjectname}} @current={{true}} />
+</Ui::Breadcrumbs>
+
+<div class="grid-x grid-padding-x">
+  <div class="cell large-8">
+    <h1>
+      {{@model.dcpProjectname}}
+    </h1>
+
+    <p>
+      <strong>Project Number:</strong> {{@model.dcpName}}
+    </p>
+
+    <p>
+      <strong>Primary Applicant:</strong> {{@model.dcpApplicantCustomerValue}}
+    </p>
+
+    <p>
+      <strong>Project Status:</strong> {{optionset 'project' 'statuscode' 'label' @model.statuscode}}
+      <span class="text-gray"> | </span>
+      <strong>Public Status:</strong>
+      <FaIcon @icon={{if @model.publicStatusGeneralPublicProject 'eye' 'eye-slash'}} @prefix="far" class="text-gray"/>
+      {{#if @model.publicStatusGeneralPublicProject}}
+        <Ui::ExternalLink @href="https://zap.planning.nyc.gov/projects/{{@model.dcpName}}"> {{optionset 'project' 'dcpPublicstatus' 'label' @model.dcpPublicstatus}} </Ui::ExternalLink>
+      {{else}}
+        {{optionset 'project' 'dcpPublicstatus' 'label' @model.dcpPublicstatus}}
+      {{/if}}
+    </p>
+
+    <p>
+      <strong>Project Brief:</strong> {{@model.dcpProjectbrief}}
+    </p>
+
+    <hr>
+
+    {{#if @model.rwcdsPackages.length}}
+      <h2>Reasonable Worst Case Development Scenario</h2>
+      <ol class="no-bullet">
+        {{#each @model.rwcdsPackages as |rwcdsPackage|}}
+          <Project::PackageListItem
+            @package={{rwcdsPackage}}
+          />
+        {{/each}}
+      </ol>
+    {{/if}}
+
+    {{#if @model.pasPackages.length}}
+      <h2>Pre-Application Statement</h2>
+      <ol class="no-bullet">
+        {{#each @model.pasPackages as |pasPackage|}}
+          <Project::PackageListItem
+            @package={{pasPackage}}
+          />
+        {{/each}}
+      </ol>
+    {{/if}}
+
+  </div>{{! end left/main column }}
+  <div class="cell large-4 sticky-sidebar">
+
+    <h3>
+      Project Editors
+      <FaIcon @icon='users-cog' @fixedWidth={{true}} />
+    </h3>
+    <ul class="no-bullet">
+      {{#each this.project.projectApplicants as |applicant|}}
+        {{#if (and (eq applicant.contact.statuscode this.contactActiveStatusCode) (eq applicant.contact.statecode this.contactActiveStateCode))}}
+          <Project::ProjectEditorListItem 
+            @name={{if applicant.contact.lastname (concat applicant.contact.firstname " " applicant.contact.lastname) applicant.dcpName}}
+            @emailAddress={{if applicant.contact.emailaddress1 applicant.contact.emailaddress1 applicant.emailaddress}}
+          />
+        {{/if}}
+      {{/each}}
+    </ul>
+
+    <Ui::Question
+      class="fieldset relative"
+      ...attributes
+      as |Q|
+    >
+
+      <div class="grid-x grid-margin-x">
+        <div class="cell medium-6">
+          <Q.Label class="middle">
+            First Name
+          </Q.Label>
+          <Input
+            @type="text"
+            autocomplete="off"
+            @value={{this.firstName}}
+          />
+        </div>
+      </div>
+
+      <div class="grid-x grid-margin-x">
+        <div class="cell medium-6">
+          <Q.Label class="middle">
+            Last Name
+          </Q.Label>
+          <Input
+            @type="text"
+            autocomplete="off"
+            @value={{this.lastName}}
+          />
+        </div>
+      </div>
+
+      <div class="grid-x grid-margin-x">
+        <div class="cell medium-6">
+          <Q.Label class="middle">
+            Email Address
+          </Q.Label>
+          <Input
+            @type="text"
+            autocomplete="off"
+            @value={{this.emailAddress}}
+          />
+        </div>
+      </div>
+    </Ui::Question>
+
+    <button
+      class="button expanded secondary no-margin"
+      type="button"
+      {{on "click" (fn this.addEditor) }}
+    >
+      <strong>Add Project Editor</strong>
+    </button>
+
+    <Ui::ConfirmationModal
+      @show={{this.modalOpen}}
+      @toggle={{fn this.saveEditor}}
+      @cancelButtonText="Cancel"
+    >
+      {{#if this.matchingCurrentApplicant}}
+        <h4>A Project Editor with the email address you entered already exists on this project.</h4>
+      {{else}}
+        <h4>Are you sure you want to add...</h4>
+        <Project::ProjectEditorListItem 
+          @name="{{this.firstName}} {{this.lastName}}"
+          @emailAddress={{this.emailAddress}}
+        />
+        <p>If you add this Editor, they will be able to view and edit this Project.</p>
+        <button
+          class="button expanded no-margin"
+          type="button"
+          {{on "click" (fn this.saveEditor) }}
+        >
+          <strong>Add Editor</strong>
+        </button>
+      {{/if}}
+    </Ui::ConfirmationModal>
+
+    <Messages::Assistance class="large-margin-top" />
+
+  </div>
+</div>
+
+{{outlet}}

@@ -5,13 +5,16 @@ import { CrmModule } from '../crm/crm.module';
 import { PasFormController } from './pas-form/pas-form.controller';
 import { ApplicantsController } from './pas-form/applicants/applicants.controller';
 import { BblsController } from './pas-form/bbls/bbls.controller';
+import { AffectedZoningResolutionsController } from './rwcds-form/affected-zoning-resolution/affected-zoning-resolutions.controller';
 import { RwcdsFormController } from './rwcds-form/rwcds-form.controller';
+import { PasFormService } from './pas-form/pas-form.service';
 import { RwcdsFormService } from './rwcds-form/rwcds-form.service';
+import { DocumentModule } from '../document/document.module';
 
 @Module({
-  imports: [CrmModule],
+  imports: [CrmModule, DocumentModule],
   exports: [PackagesService],
-  providers: [PackagesService, RwcdsFormService],
-  controllers: [PackagesController, PasFormController, RwcdsFormController, ApplicantsController, BblsController],
+  providers: [PackagesService, PasFormService, RwcdsFormService],
+  controllers: [PackagesController, PasFormController, RwcdsFormController, ApplicantsController, BblsController, AffectedZoningResolutionsController],
 })
 export class PackagesModule {}

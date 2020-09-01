@@ -22,6 +22,9 @@ export default function() {
 
   this.get('/projects');
   this.get('/contacts', (schema) => schema.contacts.first());
+  this.get('/contacts');
+
+  this.get('/projects/:id');
 
   this.get('/login', () => ({ ok: true }));
   this.get('/logout');
@@ -40,6 +43,13 @@ export default function() {
   this.patch('/bbls/:id');
   this.del('/bbls/:id');
 
+  this.get('/affected-zoning-resolutions');
+  this.get('/affected-zoning-resolutions/:id');
+  this.patch('/affected-zoning-resolutions/:id');
+
+  this.get('/rwcds-forms');
+  this.get('/rwcds-forms/:id');
+  this.patch('/rwcds-forms/:id');
   this.patch('/pas-forms');
   this.post('/pas-forms');
   this.patch('/pas-forms/:id');

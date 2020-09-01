@@ -1,35 +1,19 @@
-import Model, { attr, belongsTo } from '@ember-data/model';
-
-export const DCPHASPROJECTCHANGEDSINCESUBMISSIONOFTHEPAS_OPTIONSET = {
-  YES: {
-    code: true,
-    label: 'Yes',
-  },
-  NO: {
-    code: false,
-    label: 'No',
-  },
-};
-
-export const DCPCONSTRUCTIONPHASING_OPTIONSET = {
-  SINGLE: {
-    code: 717170000,
-    label: 'Single',
-  },
-  MULTIPLE: {
-    code: 717170001,
-    label: 'Multiple',
-  },
-};
+import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 
 export default class RwcdsFormModel extends Model {
   @belongsTo('package', { async: false })
   package;
 
+  @hasMany('affected-zoning-resolution', { async: false })
+  affectedZoningResolutions;
+
   @attr('string') dcpDescribethewithactionscenario;
 
   @attr('boolean') dcpIsplannigondevelopingaffordablehousing;
 
+  // dependent on when:
+  // there's a project-action with dcpZoningresolutiontype = 'ZR'
+  // && dcpZrsectionnumber = 'Appendix F'
   @attr('number') dcpIncludezoningtextamendment;
 
   @attr('boolean') dcpExistingconditions;
@@ -101,4 +85,23 @@ export default class RwcdsFormModel extends Model {
   @attr('date') overriddencreatedon;
 
   @attr('number') utcconversiontimezonecode;
+
+  async save() {
+    await this.saveDirtyAffectedZoningResolutions();
+    await super.save();
+  }
+
+  async saveDirtyAffectedZoningResolutions() {
+    return Promise.all(
+      this.affectedZoningResolutions
+        .filter((zoningResolution) => zoningResolution.hasDirtyAttributes)
+        .map((zoningResolution) => zoningResolution.save()),
+    );
+  }
+
+  get isAffectedZoningResolutionsDirty() {
+    const dirtyZrs = this.affectedZoningResolutions.filter((zr) => zr.hasDirtyAttributes);
+
+    return dirtyZrs.length > 0;
+  }
 }

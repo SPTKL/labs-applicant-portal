@@ -1,0 +1,92 @@
+{{#let @form as |form|}}
+  <form.Section @title="Proposed Actions">
+    <p>
+      Listed below are the actions involved in this project:
+    </p>
+
+    <div data-test-section="proposed-project-actions">
+      {{#each @form.data.affectedZoningResolutions as |affectedZoningResolution|}}
+        <form.SaveableForm
+          @model={{affectedZoningResolution}}
+          @validators={{array @validations.SaveableAffectedZoningResolutionFormValidations @validations.SubmittableAffectedZoningResolutionFormValidations}}
+          as |affectedZoningResolutionForm|
+        >
+          <Packages::RwcdsForm::ProposedProjectActionsEditor
+            @zrForm={{affectedZoningResolutionForm}}
+            @rwcdsForm={{@form}}
+          />
+        </form.SaveableForm>
+      {{/each}}
+
+      <Ui::Question as |Q|>
+        <Q.Label>
+          Describe the purpose and need for all the proposed actions
+        </Q.Label>
+
+        <p class="q-help">
+          Refer to <strong>Chapter 2 page 2</strong> of the <Ui::ExternalLink href="https://www1.nyc.gov/site/oec/environmental-quality-review/technical-manual.page">CEQR Technical manual</Ui::ExternalLink>. If multiple actions are sought, please address each action individually.
+        </p>
+
+        <form.Field
+          @attribute="dcpPurposeandneedfortheproposedaction"
+          @type="text-area"
+          @maxlength="1500"
+          id={{Q.questionId}}
+        />
+      </Ui::Question>
+
+      <Ui::Question as |Q|>
+        <Q.Legend>
+          Does the applicant plan to develop a 100% affordable housing development?
+        </Q.Legend>
+
+        <form.Field
+          @attribute="dcpIsplannigondevelopingaffordablehousing"
+          @type="radio-group"
+          as |RadioGroup|
+        >
+          <RadioGroup
+            @options={{optionset 'rwcdsForm' 'dcpIsplannigondevelopingaffordablehousing' 'list'}}
+          />
+        </form.Field>
+      </Ui::Question>
+
+      <Ui::Question as |Q|>
+        <Q.Legend>
+          Is the applicant seeking action from other City/State/Federal agencies?
+        </Q.Legend>
+
+        <p class="q-help">
+          Note that financing for affordable housing is considered an action
+        </p>
+
+        <form.Field
+          @attribute="dcpIsapplicantseekingaction"
+          @type="radio-group"
+          as |RadioGroup|
+        >
+          <RadioGroup
+            @options={{optionset 'rwcdsForm' 'dcpIsapplicantseekingaction' 'list'}}
+            @onChange={{fn (mut @form.data.dcpWhichactionsfromotheragenciesaresought) ""}} as |value|
+          >
+            {{#if (eq value (optionset 'rwcdsForm' 'dcpIsapplicantseekingaction' 'code' 'YES'))}}
+              <Ui::Question @required={{true}} as |Q|>
+                <Q.Label>
+                  Which actions from other agencies are sought?
+                </Q.Label>
+
+                <form.Field
+                  @type="text-area"
+                  @attribute="dcpWhichactionsfromotheragenciesaresought"
+                  @maxlength="2400"
+                  id={{Q.questionId}}
+                />
+
+              </Ui::Question>
+            {{/if}}
+          </RadioGroup>
+        </form.Field>
+      </Ui::Question>
+    </div>
+  </form.Section>
+{{/let}}

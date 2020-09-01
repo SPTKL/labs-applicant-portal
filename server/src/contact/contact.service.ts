@@ -3,6 +3,8 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { pick } from 'underscore';
+import { CONTACT_ATTRS } from './contacts.attrs';
 import { CrmService } from '../crm/crm.service';
 
 const ACTIVE_CODE = 1;
@@ -28,16 +30,21 @@ export class ContactService {
   public async findOneById(contactId: string) {
     try  {
       const { records: [firstRecord] } = await this.crmService.get('contacts', `
-        $filter=contactid eq ${contactId}
+        $select=${CONTACT_ATTRS.join(',')}
+        &$filter=contactid eq ${contactId}
           and statuscode eq ${ACTIVE_CODE}
         &$top=1
       `);
 
       return firstRecord;
     } catch(e) {
-      const errorMessage = `Error finding contact by ID. ${e.message}`;
-      console.log(errorMessage);
-      throw new HttpException(errorMessage, HttpStatus.UNAUTHORIZED);
+      const error = {
+        code: "CONTACT_FROM_ID_ERROR",
+        title: "Error finding contact by ID.",
+        detail: `Error finding contact by ID, possibly due to missing or bad ID. ${e.message}`,
+      }
+      console.log(error);
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -50,16 +57,27 @@ export class ContactService {
   public async findOneByEmail(email: string) {
     try {
       const { records: [firstRecord] } = await this.crmService.get('contacts', `
-        $filter=emailaddress1 eq '${email}'
+        $select=${CONTACT_ATTRS.join(',')}
+        &$filter=startswith(emailaddress1, '${email}')
           and statuscode eq ${ACTIVE_CODE}
         &$top=1
       `);
 
       return firstRecord;
     } catch(e) {
-      const errorMessage = `Error finding contact by email. ${e.message}`;
-      console.log(errorMessage);
-      throw new HttpException(errorMessage, HttpStatus.UNAUTHORIZED);
+      const error = {
+        code: "CONTACT_FROM_EMAIL_ERROR",
+        title: "Error finding contact by email.",
+        detail: `Error finding contact by email, possibly due to missing or bad email. ${e.message}`,
+      };
+      console.log(error);
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  public async update(id: string, body: object) {
+    const allowedAttrs = pick(body, CONTACT_ATTRS);
+
+    return this.crmService.update('contacts', id, allowedAttrs);
   }
 }

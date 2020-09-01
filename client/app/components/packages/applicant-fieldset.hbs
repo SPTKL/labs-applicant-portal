@@ -1,45 +1,60 @@
-{{#let @form as |Form|}}
-  <Ui::Fieldset class="fieldset relative" ...attributes as |Q|>
-    <Q.legend data-test-applicant-title="{{@applicant.friendlyEntityName}}">
+{{#let @form as |form|}}
+  <Ui::Question
+    class="fieldset relative"
+    ...attributes
+    as |Q|
+  >
+    <Q.Legend data-test-applicant-title="{{@applicant.friendlyEntityName}}">
       {{@applicant.friendlyEntityName}}
-    </Q.legend>
+    </Q.Legend>
 
     {{!-- if sent to CRM "Applicant Information" table, need to know "type" --}}
     {{#if (eq @applicant.friendlyEntityName "Applicant")}}
-      <div class="cell medium-6" data-test-applicant-type-radio-group>
-        <Form.Field
+      <Ui::Question
+        class="no-margin-top"
+        data-test-applicant-type-radio-group
+        as |Q|
+      >
+        <Q.Legend class="show-for-sr">
+          Type of applicant
+        </Q.Legend>
+
+        <form.Field
           @attribute="dcpType"
           @type="radio-group"
           as |RadioGroup|
         >
           <RadioGroup
-            @options={{array
-              (hash label='Individual' code=717170000)
-              (hash label='Organization' code=717170001)
-            }}
+            @options={{optionset 'applicant' 'dcpType' 'list'}}
           />
-        </Form.Field>
-      </div>
+        </form.Field>
+      </Ui::Question>
     {{/if}}
 
     {{!-- and if the applicant is on behalf of an organization, we need to know which organization --}}
-    {{#if (eq @applicant.dcpType 717170001)}}
+    {{#if (eq @applicant.dcpType (optionset 'applicant' 'dcpType' 'code' 'ORGANIZATION'))}}
       <label data-test-applicant-organization>
-        Organization
-        <Form.Field @attribute="dcpOrganization"/>
+        Organization Name <Ui::RequiredAsterisk />
+        <form.Field @attribute="dcpOrganization" />
       </label>
+
       <hr/>
+
       <h5>Authorized Organization Representative</h5>
     {{/if}}
 
     <div class="grid-x grid-margin-x">
       <div class="cell medium-6">
-        <label>First Name</label>
-        <Form.Field @attribute="dcpFirstname"/>
+        <label>
+          First Name <Ui::RequiredAsterisk />
+          <form.Field @attribute="dcpFirstname" />
+        </label>
       </div>
       <div class="cell medium-6">
-        <label>Last Name</label>
-          <Form.Field @attribute="dcpLastname"/>
+        <label>
+          Last Name <Ui::RequiredAsterisk />
+          <form.Field @attribute="dcpLastname" />
+        </label>
       </div>
     </div>
 
@@ -47,26 +62,28 @@
     {{#if (eq @applicant.friendlyEntityName "Other Team Member")}}
       <label>
         Organization
-        <Form.Field @attribute="dcpOrganization"/>
+        <form.Field @attribute="dcpOrganization" />
       </label>
     {{/if}}
 
     <label>
-      Email Address
-      <Form.Field @attribute="dcpEmail"/>
+      Email Address <Ui::RequiredAsterisk />
+      <form.Field @attribute="dcpEmail" />
     </label>
+
     <label>
       Address
-      <Form.Field @attribute="dcpAddress"/>
+      <form.Field @attribute="dcpAddress" />
     </label>
 
     <div class="grid-x grid-margin-x">
       <div class="cell medium-auto">
         <label>
           City
-          <Form.Field @attribute="dcpCity"/>
+          <form.Field @attribute="dcpCity" />
         </label>
       </div>
+
       <div class="cell auto medium-2">
         <label data-test-applicant-state-dropdown>
           State
@@ -76,24 +93,31 @@
             @placeholder="state"
             @searchEnabled={{true}}
             @searchField="label"
-            @options={{map-by 'code' (optionset 'applicant' 'state' 'list')}}
+            @options={{map-by 'code' (optionset 'applicant' 'dcpState' 'list')}}
             @onchange={{fn (mut @applicant.dcpState)}}
           as |stateCode|>
-            {{optionset 'applicant' 'state' 'label' stateCode}}
+            {{optionset 'applicant' 'dcpState' 'label' stateCode}}
           </PowerSelect>
         </label>
       </div>
+
       <div class="cell auto medium-4">
         <label>
           ZIP
-          <Form.Field @attribute="dcpZipcode"/>
+          <form.Field
+            @attribute="dcpZipcode"
+            type="number"
+          />
         </label>
       </div>
     </div>
 
     <label>
       Phone
-      <Form.Field @attribute="dcpPhone"/>
+      <form.Field
+        @attribute="dcpPhone"
+        type="number"
+      />
     </label>
 
     <button
@@ -106,5 +130,5 @@
       <FaIcon @icon="times" @prefix="fas" @fixedWidth={{true}} />
     </button>
 
-  </Ui::Fieldset>
+  </Ui::Question>
 {{/let}}

@@ -1,101 +1,104 @@
 <SaveableForm
-  @model={{this.pasForm}}
-  @validators={{array this.validations.SaveablePasFormValidations this.validations.SubmittablePasFormValidations}}
-  as |pasForm|
+  @model={{@package}}
+  @validators={{array (hash) this.validations.SubmittablePackageFormValidations}}
+  as |saveablePackageForm|
 >
-  <div class="grid-x grid-margin-x">
-    <div class="cell large-8">
-      <section class="form-section">
-        <h1>
-          Pre-Application Statement
-        </h1>
+  <saveablePackageForm.SaveableForm
+    @model={{saveablePackageForm.data.pasForm}}
+    @validators={{array this.validations.SaveablePasFormValidations this.validations.SubmittablePasFormValidations}}
+    as |saveablePasForm|
+  >
+    <div class="grid-x grid-margin-x">
+      <div class="cell large-8">
 
-        <p>
-          The <strong>Pre-Application Statement</strong> requests pertinent information about a site and proposed project. By
-          submitting the PAS, a prospective applicant acknowledges that they intend to file a land use application with NYC
-          Planning. Submission allows staff to be assigned from appropriate divisions and project tracking to commence.
-        </p>
+        <section class="form-section">
+          <h1 class="header-large">
+            Pre-Application Statement
+            <small class="text-weight-normal">
+              {{if @package.dcpPackageversion (concat '(V' @package.dcpPackageversion ')')}}
+            </small>
+          </h1>
 
-        <p>
-          NYC Planning understands that some projects may not be fully formed at the submission of the PAS. Give as much
-          detailed information as possible. Failure to provide detailed, relevant information will result in the PAS being
-          rejected.
-        </p>
-      </section>
+          <p>
+            The <strong>Pre-Application Statement</strong> requests pertinent information about a Site and Proposed Project. By
+            submitting the PAS, a prospective Applicant acknowledges that they intend to file a Land Use Application with NYC
+            Planning. Submission allows staff to be assigned from appropriate divisions and project tracking to commence.
+          </p>
 
-      <Packages::PasForm::ProjectInformation @form={{pasForm}} />
+          <p>
+            NYC Planning understands that some projects may not be fully formed at the submission of the PAS. Give as much
+            detailed information as possible. Failure to provide detailed, relevant information will result in the PAS being
+            rejected.
+          </p>
+        </section>
 
-      <Packages::PasForm::ApplicantTeam
-        @form={{pasForm}}
-        @addApplicant={{this.addApplicant}}
-        @removeApplicant={{this.removeApplicant}}
-        @validations={{this.validations}}
-      />
+        <Packages::PasForm::ProjectInformation @form={{saveablePasForm}} />
 
-      <Packages::PasForm::ProjectGeography @form={{pasForm}} />
-
-      <Packages::PasForm::ProposedLandUseActions @form={{pasForm}} />
-
-      <Packages::PasForm::ProjectArea @form={{pasForm}} />
-
-      <Packages::PasForm::ProposedDevelopmentSite @form={{pasForm}} />
-
-      <Packages::PasForm::ProjectDescription @form={{pasForm}} />
-
-      <Packages::PasForm::AttachedDocuments
-        @form={{pasForm}}
-        @model={{this.pasForm}}
-      />
-
-    </div>
-    <div class="cell large-4">
-      <pasForm.StickySidebar>
-        <pasForm.SaveButton
-          @isEnabled={{or @package.isDirty pasForm.isSaveable}}
-          @onClick={{this.savePackage}}
-          data-test-save-button
+        <Packages::PasForm::ApplicantTeam
+          @form={{saveablePasForm}}
+          @addApplicant={{this.addApplicant}}
+          @removeApplicant={{this.removeApplicant}}
+          @validations={{this.validations}}
         />
-        {{!-- Error Handling --}}
-        <Packages::PasForm::PasFormError @package={{@package}} />
-        <pasForm.SubmitButton
-          @onClick={{this.toggleModal}}
-          @isEnabled={{pasForm.isSubmittable}}
-          class="secondary"
-          data-test-submit-button
+
+        <Packages::PasForm::ProjectGeography @form={{saveablePasForm}} />
+
+        <Packages::PasForm::ProposedLandUseActions @form={{saveablePasForm}} />
+
+        <Packages::PasForm::ProjectArea @form={{saveablePasForm}} />
+
+        <Packages::PasForm::ProposedDevelopmentSite @form={{saveablePasForm}} />
+
+        <Packages::PasForm::ProjectDescription @form={{saveablePasForm}} />
+
+        <Packages::PasForm::AttachedDocuments
+          @form={{saveablePackageForm}}
+          @model={{@package}}
         />
-      </pasForm.StickySidebar>
-      {{#if this.modalIsOpen}}
-        <EmberWormhole @to="reveal-modal-container">
-          <RevealModal @toggle={{this.toggleModal}}>
-            <h6>Confirm Pre-Applicant Statement submission</h6>
-            <p class="header-large medium-margin-top small-margin-bottom">Are you sure?</p>
-            <p>Before submitting, ensure that your answers are accurate and complete, and that necessary attachments (including the signature form) have been uploaded. If City Planning does not receive enough accurate information to provide guidance, the lead planner will notify you and request that this form be resubmitted with needed materials, corrections, or clarifications.</p>
-            <hr>
-            <div class="grid-x">
-              <div class="cell large-6 small-padding-right">
-                <button
-                  type="button"
-                  class="button expanded large secondary"
-                  disabled={{pasForm.saveChangeset.isRunning}}
-                  {{on "click" this.toggleModal}}
-                >
-                  Continue Editing
-                </button>
-              </div>
-              <div class="cell large-6 small-padding-left">
-                <pasForm.SubmitButton
-                  @onClick={{this.submitPackage}}
-                  @isEnabled={{pasForm.isSubmittable}}
-                  class="no-margin"
-                  data-test-confirm-submit-button
-                />
-              </div>
-            </div>
-            {{!-- Error Handling --}}
-            <Packages::PasForm::PasFormError @package={{@package}}/>
-          </RevealModal>
-        </EmberWormhole>
-      {{/if}}
+
+      </div>{{! end left/main column }}
+      <div class="cell large-4 sticky-sidebar">
+
+        <saveablePasForm.PageNav>
+          <saveablePackageForm.SaveButton
+            @isEnabled={{or @package.isDirty saveablePackageForm.isSaveable}}
+            @onClick={{this.savePackage}}
+            data-test-save-button
+          />
+
+          <Packages::PasForm::PasFormError @package={{@package}} />
+
+          <saveablePackageForm.SubmitButton
+            @isEnabled={{saveablePackageForm.isSubmittable}}
+            class="secondary"
+            data-test-submit-button
+          />
+        </saveablePasForm.PageNav>
+
+        <saveablePackageForm.ConfirmationModal
+          @action={{component saveablePackageForm.SubmitButton
+            onClick=this.submitPackage
+            isEnabled=saveablePackageForm.isSubmittable
+            class="no-margin"
+          }}
+          @footer={{component 'packages/pas-form/pas-form-error'
+            package=@package
+          }}
+          @cancelButtonText="Continue Editing"
+          data-test-confirm-submit-button={{true}}
+        >
+          <h6>Confirm Pre-Applicant Statement Submission</h6>
+          <p class="header-large medium-margin-top small-margin-bottom">
+            Are you sure?
+          </p>
+          <p>
+            Before submitting, ensure that your answers are accurate and complete, and that necessary attachments (including the signature form) have been uploaded. If NYC Planning does not receive enough accurate information to provide guidance, the Lead Planner will notify you and request that this form be resubmitted with necessary materials, corrections, or clarifications.
+          </p>
+        </saveablePackageForm.ConfirmationModal>
+
+        <Messages::Assistance class="large-margin-top" />
+
+      </div>{{! end right/sidebar column }}
     </div>
-  </div>
+  </saveablePackageForm.SaveableForm>
 </SaveableForm>

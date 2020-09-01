@@ -1,0 +1,57 @@
+<@form.Section @title="Attached Documents">
+  <Packages::Attachments
+    @package={{@model.package}}
+    @fileManager={{@model.package.fileManager}}
+    data-test-section="attachments"
+  />
+
+  <h4>
+    Please attach the following required documents:
+  </h4>
+
+  <ul>
+    <li>
+      <Ui::DownloadLink @href="https://www1.nyc.gov/assets/planning/download/office/applicants/applicant-portal/part2-rwcds-analysis-framework-table.xlsx">
+        RWCDS Analysis Framework Table
+      </Ui::DownloadLink>
+    </li>
+    <li>
+      <Ui::DownloadLink @href="https://www1.nyc.gov/assets/planning/download/office/applicants/applicant-portal/part3-rwcds-analysis-framework-spreadsheet.xlsx">
+        RWCDS Analysis Framework Spreadsheet
+      </Ui::DownloadLink>
+    </li>
+    <li>
+      Massing diagrams
+      <small>
+        (if the future With-Action Scenario does not maximize all available bulk and/or FAR)
+      </small>
+    </li>
+  </ul>
+
+  <p>
+    A map of the directly affected area can aid the review of the Proposed Actions. If maps are provided, they should not exceed 11x17”, and each map must clearly include:
+  </p>
+
+  <ol class="text-small">
+    <li>
+      The boundaries of the directly affected area or areas
+    </li>
+    <li>
+      A 400-foot radius drawn from the outer boundaries of the Project Site
+    </li>
+    <li>
+      A title, scale and legend
+    </li>
+    <li>
+      Identification/label of any Applicant-owned Sites and additional Projected and/or Potential Development Sites
+    </li>
+    <li>
+      Labeled streets and labeled tax lots, where applicable
+    </li>
+  </ol>
+
+  <p>
+    Additional materials such as Zoning Maps, massing diagrams, illustrative drawings, etc. that help explain the Proposed Project may also be submitted.
+  </p>
+
+</@form.Section>
